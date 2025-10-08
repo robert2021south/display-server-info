@@ -79,6 +79,7 @@ If everything is all right, you will see the "Server Information" widget under t
 = 2.1.2 =
 * Added Author URI to the plugin header: https://robertwp.com
 * Replaced namespace DisplayServerInfoPlugin with RobertWP\DisplayServerInfo
+* Removed `load_plugin_textdomain()` call since it's no longer needed for WordPress 4.6 and above.
 
 = 2.1.1 =
 * Added uninstall cleanup functionality — plugin options will now be removed when uninstalled.
@@ -98,4 +99,8 @@ If everything is all right, you will see the "Server Information" widget under t
 * Initial version
 
 == Upgrade Notice ==
+
+= 2.1.2 =
 Added Author URI to the plugin header: https://robertwp.com
+Removed `load_plugin_textdomain()` call since it's no longer needed for WordPress 4.6 and above.
+Replaced namespace DisplayServerInfoPlugin with RobertWP\DisplayServerInfo
