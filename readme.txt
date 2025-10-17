@@ -5,7 +5,7 @@ Donate link: http://ko-fi.com/robertsouth
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,6 +76,9 @@ If everything is all right, you will see the "Server Information" widget under t
 7. Shortcode Use Case
 
 == Changelog ==
+= 2.1.3 =
+* Update author name
+
 = 2.1.2 =
 * Added Author URI to the plugin header: https://robertwp.com
 * Replaced namespace DisplayServerInfoPlugin with RobertWP\DisplayServerInfo
