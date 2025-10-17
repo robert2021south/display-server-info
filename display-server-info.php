@@ -4,8 +4,8 @@ namespace RobertWP\DisplayServerInfo;
  * Plugin Name: Display Server Info
  * Description: This plugin including PHP, MySQL, server software,and OS details in the WordPress admin dashboard.It also provides options to show the information in the admin bar and footer.
  *
- * Version: 2.1.2
- * Author: Robert South
+ * Version: 2.1.3
+ * Author: RobertWP (Robert South)
  * Author URI: https://robertwp.com
  * License: GPLv3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -19,7 +19,7 @@ if ( !defined('ABSPATH') ) {
 
 class DisplayServerInfo {
 
-    const VERSION = '2.1.2';
+    const VERSION = '2.1.3';
     private $plugin_url;
 
     public function __construct() {
