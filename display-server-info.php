@@ -48,7 +48,8 @@ class DisplayServerInfo {
         return $links;
     }
 
-    public function handle_css_js($hook) {
+    public function handle_css_js($hook): void
+    {
 
         wp_register_style('disi-common-style-min', $this->plugin_url . 'assets/css/disi-common-style.min.css', [], self::VERSION );
         wp_register_style('disi-dashboard-style-min', $this->plugin_url . 'assets/css/disi-dashboard-style.min.css', [], self::VERSION );
@@ -92,13 +93,15 @@ class DisplayServerInfo {
 
     }
 
-    public function add_dashboard_widget() {
+    public function add_dashboard_widget(): void
+    {
         if (get_option('disi_dashboard_widget_enable', '1') === '1') {
             wp_add_dashboard_widget('disi_dashboard_widget', __('Server Information', 'display-server-info'), [$this, 'display_dashboard_widget']);
         }
     }
 
-    public function display_dashboard_widget() {
+    public function display_dashboard_widget(): void
+    {
         $nonce = wp_create_nonce('options_general_page_nonce');
 
         $server_info = $this->get_server_info();
@@ -117,7 +120,8 @@ class DisplayServerInfo {
         do_action('disi_dashboard_widget_after_content');
     }
 
-    public function add_admin_bar_info($wp_admin_bar) {
+    public function add_admin_bar_info($wp_admin_bar): void
+    {
         if (!current_user_can('manage_options') || get_option('disi_admin_bar_enable', '0') !== '1') {
             return;
         }
@@ -134,7 +138,8 @@ class DisplayServerInfo {
         ]);
     }
 
-    public function add_footer_info() {
+    public function add_footer_info(): void
+    {
         if (get_option('disi_footer_enable', '0') === '1') {
             $server_info = $this->get_server_info();
             echo '<div class="disi-admin-footer-info">';
@@ -148,7 +153,8 @@ class DisplayServerInfo {
         }
     }
 
-    public function add_settings_page() {
+    public function add_settings_page(): void
+    {
         add_submenu_page(
                 'options-general.php',
                 __('More - Display Server Info', 'display-server-info'),
@@ -159,7 +165,8 @@ class DisplayServerInfo {
             );
     }
 
-    public function render_settings_page() {
+    public function render_settings_page(): void
+    {
 
         if (!current_user_can('manage_options')) {
             wp_die(esc_html(__('Permission denied', 'display-server-info')));
@@ -172,7 +179,8 @@ class DisplayServerInfo {
         include  plugin_dir_path(__FILE__) . 'templates/settings-page.php';
     }
 
-    public function handle_ajax_request() {
+    public function handle_ajax_request()
+    {
 
         if (!(is_admin()
             && defined('DOING_AJAX')
@@ -208,7 +216,8 @@ class DisplayServerInfo {
         wp_die();
     }
 
-    public function add_shortcode(){
+    public function add_shortcode()
+    {
         if (get_option('disi_shortcode_enable', '0') === '1') {
 
             $server_info = $this->get_server_info();
@@ -224,7 +233,8 @@ class DisplayServerInfo {
         }
     }
 
-    public function phpinfo_ajax_handler(){
+    public function phpinfo_ajax_handler(): void
+    {
         if (!current_user_can('manage_options')) {
             wp_send_json_error(array('message' => __('Permission denied', 'display-server-info')), 403);
         }
@@ -235,13 +245,15 @@ class DisplayServerInfo {
         wp_send_json_success(array('phpinfo' => $phpinfo));
     }
 
-    public function add_action_links($links) {
+    public function add_action_links($links)
+    {
         $settings_link = '<a href="' . admin_url('options-general.php?page=display_server_info') . '">' . __('Settings', 'display-server-info') . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
 
-    private function get_server_info() {
+    private function get_server_info(): array
+    {
         global $wpdb;
 
         return [
@@ -254,7 +266,8 @@ class DisplayServerInfo {
         ];
     }
 
-    private function load_msg(){
+    private function load_msg(): array
+    {
         return [
             "settingsSavedText"  => __( 'Settings saved successfully', 'display-server-info' ),
             "errorOccurredText"  => __( 'An error occurred when saving the settings', 'display-server-info' ),
