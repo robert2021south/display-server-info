@@ -1,11 +1,11 @@
 === Display Server Info ===
 Contributors: robert2021south
-Tags: server information, php info, dashboard widget, shortcode support, multilingual plugin
+Tags: server info, php info, dashboard widget, system info, shortcode
 Donate link: http://ko-fi.com/robertsouth
 Requires at least: 5.6
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 2.1.3
+Stable tag: 2.2.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -13,12 +13,12 @@ Displays server, PHP, and database info in the dashboard, admin bar, and footer,
 
 == Description ==
 
-**Full Description:**
+Full Description:
 Display Server Info is a powerful WordPress plugin that provides detailed server information for administrators directly within the dashboard.
 It adds server, PHP, and database information to the dashboard, top admin bar, and footer for quick access.
 The settings menu includes a "Display Server Info" submenu with two tabs:
 
-1. **Server Information Tab:**
+1. Server Information Tab:
    In this tab, you will see the information about:
     Operating System
     Hostname
@@ -45,12 +45,40 @@ The settings menu includes a "Display Server Info" submenu with two tabs:
 
     Please rate the Plugin if you find it useful, thanks.
 
-2. **Settings Tab:**
+2. Settings Tab:
    Configure plugin behavior with four toggle switches to enable or disable server information display in the dashboard, admin bar, and footer.
    Additionally, users can activate shortcode functionality, allowing `[disi_server_info]` to display server information anywhere in posts or pages.
 
 The plugin is fully translated into 7 international languages, making it accessible for a global audience.
 
+= Privacy =
+This plugin respects your privacy. Any data collected (such as anonymous usage stats or optional feedback) is handled transparently and securely.
+All data, including any optional email address, is transmitted securely (via TLS/HTTPS) and retained only as long as necessary. For example, feedback data is retained for a maximum of 12 months to help us improve the plugin.
+For complete details on what data is collected, how it is stored (including hashing and encryption for email addresses), the legal basis under GDPR/CCPA, and your rights, please read our full privacy policy:
+https://robertwp.com/privacy-policy
+
+== Frequently Asked Questions ==
+
+= Does this plugin slow down my website? =
+No. Display Server Info is lightweight and optimized. It performs simple server checks and does not impact your site’s performance.
+
+= Where can I see the server information after installing the plugin? =
+You can view it in multiple places:
+ 	Dashboard widget
+ 	Top admin bar
+ 	Admin footer
+ 	“More Info” page
+ 	PHP info page
+    And via shortcode on posts or pages
+
+= Does the plugin clean up after uninstalling? =
+Yes. All plugin options are removed during uninstall to keep your database clean.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+
+= Is the plugin compatible with the latest WordPress version? =
+Yes. The plugin is tested with the latest WordPress releases and maintained with ongoing updates.
+
+= Can I display server information on the frontend? =
+Yes. Use the shortcode <code data-start="1463" data-end="1483">[disi_server_info]</code> to display server details anywhere on your site.
 
 == Installation ==
 
@@ -76,6 +104,13 @@ If everything is all right, you will see the "Server Information" widget under t
 7. Shortcode Use Case
 
 == Changelog ==
+
+= 2.2.0 =
+* Added feedback form in settings page
+* Implemented star rating system with half-star support
+* Added option to leave feedback with email (optional)
+* Enhanced user experience with toast notifications
+
 = 2.1.3 =
 * Update author name
 
@@ -103,7 +138,8 @@ If everything is all right, you will see the "Server Information" widget under t
 
 == Upgrade Notice ==
 
-= 2.1.2 =
-Added Author URI to the plugin header: https://robertwp.com
-Removed `load_plugin_textdomain()` call since it's no longer needed for WordPress 4.6 and above.
-Replaced namespace DisplayServerInfoPlugin with RobertWP\DisplayServerInfo
+= 2.2.0 =
+* Added feedback form in settings page
+* Implemented star rating system with half-star support
+* Added option to leave feedback with email (optional)
+* Enhanced user experience with toast notifications

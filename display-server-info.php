@@ -1,11 +1,13 @@
 <?php
 namespace RobertWP\DisplayServerInfo;
+use Random\RandomException;
+
 /**
  * Plugin Name: Display Server Info
  * Description: This plugin including PHP, MySQL, server software,and OS details in the WordPress admin dashboard.It also provides options to show the information in the admin bar and footer.
  *
- * Version: 2.1.3
- * Author: RobertWP (Robert South)
+ * Version: 2.2.0
+ * Author: RobertWP
  * Author URI: https://robertwp.com
  * License: GPLv3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -19,8 +21,10 @@ if ( !defined('ABSPATH') ) {
 
 class DisplayServerInfo {
 
-    const VERSION = '2.1.3';
-    private $plugin_url;
+    const VERSION = '2.2.0';
+    private string $plugin_url;
+
+    private string $apiBaseUrl = 'https://api.robertwp.com/api';
 
     public function __construct() {
         $this->plugin_url = plugin_dir_url(__FILE__);
@@ -33,17 +37,27 @@ class DisplayServerInfo {
         add_action('admin_menu', [$this, 'add_settings_page']);
         add_action('wp_ajax_disi_save_settings', [$this, 'handle_ajax_request']);
         add_action('wp_ajax_disi_get_phpinfo', [$this, 'phpinfo_ajax_handler']);
+        add_action('wp_ajax_disi_send_feedback', [$this, 'handle_feedback_submission']);
         add_shortcode('disi_server_info', [$this, 'add_shortcode']);
 
         // Filters
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_action_links']);
         add_filter('plugin_row_meta', [$this, 'add_meta_links'], 10, 2);
+        add_action('init', [$this, 'maybe_init_site_uuid']);
+    }
 
+    /**
+     * Initialize site UUID if not exists (runs on every page load, but only creates once)
+     * @throws RandomException
+     */
+    public function maybe_init_site_uuid(): void {
+        // Just ensure UUID exists, no need to return anything
+        $this->get_site_uuid();
     }
 
     function add_meta_links($links, $file) {
         if ($file === plugin_basename(__FILE__)) {
-            $links[] = '<a href="http://ko-fi.com/robertsouth" target="_blank" style="color: #d9534f;">Buy Me a Coffee ❤</a>';
+            $links[] = '<a href="http://ko-fi.com/robertsouth" target="_blank">❤</a>';
         }
         return $links;
     }
@@ -252,6 +266,78 @@ class DisplayServerInfo {
         return $links;
     }
 
+    /**
+     * Handle feedback submission from the plugin settings page
+     * @throws RandomException
+     */
+    public function handle_feedback_submission(): void
+    {
+
+        // Security checks
+        if (!check_ajax_referer('disi_save_settings_nonce', 'nonce', false)) {
+            wp_send_json_error('Security check failed', 403);
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied', 403);
+        }
+
+        // Get access token first
+        $token = $this->get_access_token();
+        if (!$token) {
+            wp_send_json_error('Unable to obtain access token. Please try again later.', 500);
+            return;
+        }
+
+        // Get and validate input
+        $rating = isset($_POST['rating']) ? floatval($_POST['rating']) : 0;
+        $feedback_type = isset($_POST['feedback_type']) ? sanitize_text_field(wp_unslash($_POST['feedback_type'])) : 'general';
+        $feedback_message = isset($_POST['message']) ? sanitize_textarea_field(wp_unslash($_POST['message'])) : '';
+        $user_email = isset($_POST['user_email']) ? sanitize_email(wp_unslash($_POST['user_email'])) : '';
+
+        if ($rating === 0 && empty($feedback_message)) {
+            wp_send_json_error('Please provide either a rating or a message', 400);
+        }
+
+        // Prepare data for API (now using site_uuid, not site_url)
+        $data = [
+            'rating' => $rating,
+            'feedback_type' => $feedback_type,
+            'message' => $feedback_message,
+            'user_email' => $user_email,
+            'wp_version' => get_bloginfo('version'),
+            'php_version' => PHP_VERSION,
+            'locale' => get_locale(),
+            'meta' => null
+        ];
+
+        // Send to Laravel API with token
+        $response = wp_remote_post($this->apiBaseUrl . '/feedback', [
+            'timeout' => 15,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ],
+            'body' => json_encode($data),
+        ]);
+
+        if (is_wp_error($response)) {
+            //error_log('Feedback submission failed: ' . $response->get_error_message());
+            wp_send_json_error('Failed to send feedback', 500);
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        if ($response_code >= 200 && $response_code < 300) {
+            wp_send_json_success('Thank you for your feedback!');
+        } else {
+            //error_log('Feedback API returned error: ' . $response_code . ' - ' . wp_remote_retrieve_body($response));
+            wp_send_json_error('Feedback service error', 500);
+        }
+    }
+
+    /* ===================  Private method  ====================== */
+
     private function get_server_info(): array
     {
         global $wpdb;
@@ -276,6 +362,92 @@ class DisplayServerInfo {
             "illegalRequestText"  => __( 'Illegal request', 'display-server-info' ),
             "permissionDeniedText"  => __( 'Permission denied', 'display-server-info' )
         ];
+    }
+
+    /**
+     * Get access token from Laravel API
+     *
+     * @return string|null
+     * @throws RandomException
+     */
+    private function get_access_token(): ?string
+    {
+        $siteUuid = $this->get_site_uuid();
+        $token_option = 'disi_api_token_' . md5($siteUuid);
+
+        // Check for cached token
+        $cached_token = get_transient($token_option);
+        if ($cached_token) {
+            return $cached_token;
+        }
+
+        // Request new token
+        $response = wp_remote_post($this->apiBaseUrl . '/auth/issue-feedback-token', [
+            'timeout' => 15,
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'site_uuid' => $siteUuid,
+                'plugin_slug' => 'display-server-info',
+                'plugin_version' => self::VERSION,
+            ]),
+        ]);
+
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (isset($body['status']) && $body['status'] === 'success' && isset($body['data']['token'])) {
+            $token = $body['data']['token'];
+            set_transient($token_option, $token, MINUTE_IN_SECONDS * 4);
+            return $token;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get or generate site UUID
+     *
+     * @return string
+     * @throws RandomException
+     */
+    private function get_site_uuid(): string
+    {
+        $option_name = 'disi_site_uuid';
+        $uuid = get_option($option_name);
+
+        if (empty($uuid)) {
+            $uuid = $this->generate_uuid_v4();
+            update_option($option_name, $uuid, true);
+
+            // 可选：记录日志便于调试
+            //error_log('Display Server Info: New site UUID generated');
+        }
+
+        return $uuid;
+    }
+
+    /**
+     * Generate a valid UUID v4
+     *
+     * @return string
+     * @throws RandomException
+     */
+    private function generate_uuid_v4(): string
+    {
+        $data = random_bytes(16);
+
+        // Set version to 0100 (UUID v4)
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        // Set variant to 10xx (RFC 4122)
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        // Format as UUID
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
 }

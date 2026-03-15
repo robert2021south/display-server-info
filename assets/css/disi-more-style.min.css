@@ -1,17 +1,20 @@
-/*** more page ***/
-.list-group-item.active{
+/*** More page styles ***/
+.list-group-item.active {
     text-align: center;
     font-size: larger;
 }
 
-.list-group-item{
-    text-align:right;
-}
-.list-group-item span{
-    float:left;
+.list-group-item {
+    text-align: right;
 }
 
-.nav-tabs>li>a, .nav-tabs>li>a:focus, .nav-tabs>li>a:hover {
+.list-group-item span {
+    float: left;
+}
+
+.nav-tabs > li > a,
+.nav-tabs > li > a:focus,
+.nav-tabs > li > a:hover {
     font-size: large;
 }
 
@@ -61,12 +64,11 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-.checkbox label{
+.checkbox label {
     margin-right: 20px;
 }
 
-
-/*Toast CSS*/
+/* Toast notification CSS */
 .disi-toast {
     position: fixed;
     top: 50%;
@@ -100,7 +102,7 @@ input:checked + .slider:before {
     background-color: rgba(241, 196, 15, 0.9);
 }
 
-/*spinner*/
+/* Spinner/loader */
 #disi-ajax-loader {
     position: fixed;
     top: 50%;
@@ -110,14 +112,15 @@ input:checked + .slider:before {
 }
 
 #phpinfo-output {
-    max-height: 400px;  
-    overflow-y: scroll; 
+    max-height: 400px;
+    overflow-y: scroll;
     padding: 10px;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
 }
-.disi-phpinfo-div{
-    display:none;
+
+.disi-phpinfo-div {
+    display: none;
 }
 
 .disi-modal-overlay {
@@ -126,19 +129,100 @@ input:checked + .slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center; 
-    align-items: center;    
-    z-index: 1000;          
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
+
 .disi-loader {
     width: 50px;
     height: 50px;
-    border: 5px solid #f3f3f3; 
-    border-top: 5px solid #3498db; 
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+/* ===== Star Rating Component ===== */
+.wp-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    unicode-bidi: bidi-override;
+    direction: ltr;
+    margin: 10px 0;
+}
+
+.wp-rating .star {
+    font-family: 'dashicons' !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin: 0 2px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    position: relative !important;
+    color: #ffb900 !important;
+    font-size: 0 !important; /* Hide text content */
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+}
+
+.wp-rating .star::before {
+    font-family: 'dashicons' !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    text-indent: 0 !important;
+    speak: none !important;
+    font-weight: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Empty star - default state */
+.wp-rating .star::before {
+    content: "\f154" !important; /* dashicons-star-empty */
+}
+
+/* Hover state */
+.wp-rating .star:hover::before,
+.wp-rating .star.hover::before,
+.wp-rating .star:hover ~ .star::before {
+    content: "\f155" !important; /* dashicons-star-filled */
+}
+
+/* Selected state */
+.wp-rating .star.selected::before,
+.wp-rating .star.selected ~ .star::before {
+    content: "\f155" !important; /* dashicons-star-filled */
+}
+
+/* Half star state */
+.wp-rating .star.half::before,
+.wp-rating .star.half-selected::before {
+    content: "\f459" !important; /* dashicons-star-half */
+}
+
+/* Ensure buttons are clickable and have no default styles */
+.wp-rating .star:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Reset direction impact */
+.wp-rating .star {
+    direction: ltr !important;
 }
 
 @keyframes spin {
@@ -149,6 +233,7 @@ input:checked + .slider:before {
         transform: rotate(360deg);
     }
 }
-.disi-hidden{
+
+.disi-hidden {
     display: none !important;
 }
